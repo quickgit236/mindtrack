@@ -402,7 +402,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 /* mode + sessions */
 .pomo-mode-label{font-family:'DM Mono',monospace;font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#555;margin-bottom:12px;}
 .pomo-mode-label.work{color:var(--danger);}.pomo-mode-label.break{color:var(--accent2);}
-.pomo-sessions{display:flex;gap:8px;margin-bottom:16px;}
+.pomo-sessions{display:none;}
 .pomo-session-dot{width:12px;height:12px;border-radius:2px;background:#222;border:1px solid #333;transition:background 0.3s;}
 .pomo-session-dot.done{background:var(--danger);border-color:var(--danger);}
 .pomo-session-dot.current{background:var(--danger);border-color:var(--danger);animation:pomoPulse 1s infinite;}
@@ -462,6 +462,17 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
 .reminder-time-item input[type=time]:focus{border-color:var(--accent);}
 .add-reminder-btn{font-size:11px;font-family:'DM Mono',monospace;color:var(--accent);background:transparent;border:1px dashed rgba(200,240,96,0.3);border-radius:var(--radius-sm);padding:5px 12px;cursor:pointer;transition:all 0.12s;width:100%;margin-top:4px;}
 .add-reminder-btn:hover{background:rgba(200,240,96,0.05);}
+/* COLLAPSIBLE FILTER BAR */
+.filter-summary-row{display:flex;align-items:center;gap:10px;margin-bottom:4px;}
+.filter-active-pills{display:flex;gap:6px;flex-wrap:wrap;flex:1;}
+.filter-active-pill{font-size:11px;font-family:"DM Mono",monospace;padding:4px 10px;border-radius:20px;background:var(--accent);color:#111;font-weight:600;}
+.filter-active-pill.impact{background:var(--accent2);color:#111;}
+.filter-active-pill.smart{background:var(--purple);color:#fff;}
+.filter-active-pill.cat{background:var(--surface2);color:var(--text-muted);border:1px solid var(--border);}
+.filter-toggle-btn{background:var(--surface2);border:1px solid var(--border);color:var(--text-muted);font-family:"DM Mono",monospace;font-size:11px;padding:6px 12px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all 0.15s;display:flex;align-items:center;gap:5px;}
+.filter-toggle-btn:hover{border-color:var(--accent);color:var(--accent);}
+.filter-toggle-btn.open{border-color:var(--accent);color:var(--accent);background:rgba(200,240,96,0.08);}
+.filter-panel{display:flex;flex-direction:column;gap:10px;padding:12px 0 4px;border-top:1px solid var(--border);margin-top:4px;animation:slideIn 0.15s ease;}
 /* TODAY AT A GLANCE */
 .glance-greeting{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:4px;}
 .glance-date{font-size:12px;font-family:'DM Mono',monospace;color:var(--text-muted);margin-bottom:20px;text-transform:uppercase;letter-spacing:1px;}
@@ -753,7 +764,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
           <span style="color:var(--text-dim);font-size:18px">◻</span>
           <input type="text" id="quickTask" placeholder="Quick add task — press Enter…" onkeydown="quickAddTask(event)">
           <select id="quickPriority" class="form-select" style="width:auto;padding:6px 10px;font-size:12px;">
-            <option value="medium">Medium</option><option value="urgent">Urgent</option><option value="high">High</option><option value="low">Low</option>
+            <option value="urgent">High-Urgency</option><option value="low" selected>Low-Urgency</option>
           </select>
         </div>
         <div class="filter-bar">
@@ -813,7 +824,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
             <div class="matrix-quad-header">
               <div>
                 <div class="matrix-quad-title" style="color:var(--danger)">🔴 Do First</div>
-                <div class="matrix-quad-sub">Urgent & Important</div>
+                <div class="matrix-quad-sub">High-Urgency & Important</div>
               </div>
               <span class="matrix-quad-badge" id="q1-badge">0</span>
             </div>
@@ -823,7 +834,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
             <div class="matrix-quad-header">
               <div>
                 <div class="matrix-quad-title" style="color:var(--warn)">📅 Schedule</div>
-                <div class="matrix-quad-sub">Not Urgent & Important</div>
+                <div class="matrix-quad-sub">Not High-Urgency & Important</div>
               </div>
               <span class="matrix-quad-badge" id="q2-badge">0</span>
             </div>
@@ -833,7 +844,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
             <div class="matrix-quad-header">
               <div>
                 <div class="matrix-quad-title" style="color:var(--accent2)">📤 Delegate</div>
-                <div class="matrix-quad-sub">Urgent & Not Important</div>
+                <div class="matrix-quad-sub">High-Urgency & Low-Impact</div>
               </div>
               <span class="matrix-quad-badge" id="q3-badge">0</span>
             </div>
@@ -843,7 +854,7 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
             <div class="matrix-quad-header">
               <div>
                 <div class="matrix-quad-title" style="color:var(--text-muted)">🗑 Eliminate</div>
-                <div class="matrix-quad-sub">Not Urgent & Not Important</div>
+                <div class="matrix-quad-sub">Not High-Urgency & Low-Impact</div>
               </div>
               <span class="matrix-quad-badge" id="q4-badge">0</span>
             </div>
@@ -907,7 +918,6 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
           <!-- TOMATO + TIMER -->
           <div class="pixel-tomato-grid" id="tomatoGrid"></div>
           <div class="pomo-mode-label" id="pomoModeLabel">Focus</div>
-          <div class="pomo-sessions" id="pomoSessions"></div>
           <div class="pomo-time-display">
             <div class="pixel-digits" id="pixelDigits"></div>
             <div class="pixel-date-bar" id="pomoDateBar"></div>
@@ -972,13 +982,13 @@ body::before{content:'';position:fixed;inset:0;background-image:url("data:image/
       <div class="form-group">
         <label class="form-label">Priority</label>
         <select class="form-select" id="m-priority">
-          <option value="urgent">🔴 Urgent</option><option value="high">🟠 High</option><option value="medium" selected>🔵 Medium</option><option value="low">⚪ Low</option><option value="idea">⟡ Idea</option>
+          <option value="urgent">🔴 High-Urgency</option><option value="low" selected>⚪ Low-Urgency</option><option value="idea">⟡ Idea</option>
         </select>
       </div>
       <div class="form-group">
         <label class="form-label">Importance</label>
         <select class="form-select" id="m-importance">
-          <option value="">— Unclassified —</option><option value="important">⭐ Important</option><option value="not-important">— Not Important</option>
+          <option value="">— Unclassified —</option><option value="important">⭐ Important</option><option value="not-important">▽ Low-Impact</option>
         </select>
       </div>
     </div>
@@ -1149,7 +1159,7 @@ function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'
 function isToday(d) { if(!d) return false; return new Date(d+'T00:00:00').toDateString() === new Date().toDateString(); }
 function isOverdue(d) { if(!d) return false; const dt=new Date(d+'T00:00:00'),now=new Date(); now.setHours(0,0,0,0); return dt<now; }
 function formatDue(d) { if(!d) return ''; return new Date(d+'T00:00:00').toLocaleDateString([],{month:'short',day:'numeric',year:'numeric'}); }
-function priorityLabel(p) { return {urgent:'🔴 Urgent',high:'🟠 High',medium:'🔵 Medium',low:'⚪ Low',idea:'⟡ Idea'}[p]||p; }
+function priorityLabel(p) { return {urgent:'🔴 High-Urgency',low:'⚪ Low-Urgency',idea:'⟡ Idea'}[p]||p; }
 function calcProgress(ms, fb) { if(!ms||!ms.length) return fb||0; return Math.round(ms.filter(m=>m.done).length/ms.length*100); }
 
 function getNextDue(d, recur, days) {
@@ -1193,7 +1203,7 @@ function renderDashboard() {
   if (dateEl) dateEl.textContent = new Date().toLocaleDateString([],{weekday:'long',month:'long',day:'numeric',year:'numeric'});
 
   // Task lists
-  renderList('urgent-list', tasks.filter(t=>!t.done&&(t.priority==='urgent'||isOverdue(t.due))), 'No urgent or overdue tasks 🎉');
+  renderList('urgent-list', tasks.filter(t=>!t.done&&(t.priority==='urgent'||isOverdue(t.due))), 'No high-urgency or overdue tasks 🎉');
   renderList('today-list', tasks.filter(t=>!t.done&&t.due===todayStr&&!isOverdue(t.due)), 'Nothing due today');
 
   // Habits today
@@ -1301,7 +1311,7 @@ function renderTaskCard(task) {
       <div class="task-title">${escHtml(task.title)}</div>
       <div class="task-meta">
         <span class="tag ${task.priority}">${priorityLabel(task.priority)}</span>
-        ${task.importance?`<span class="tag ${task.importance}">${task.importance==='important'?'⭐ Important':'— Not Important'}</span>`:''}
+        ${task.importance?`<span class="tag ${task.importance}">${task.importance==='important'?'⭐ Important':'▽ Low-Impact'}</span>`:''}
         ${task.category?`<span class="tag">${escHtml(task.category)}</span>`:''}
         ${task.due?`<span class="task-due ${overdue&&!task.done?'overdue':''}">${overdue&&!task.done?'⚠ Overdue · ':todayDue?'📅 Today · ':''}${formatDue(task.due)}</span>`:''}
         ${task.recur?`<span class="recur-tag">↺ ${recurLabels[task.recur]||task.recur}</span>`:''}
@@ -1335,11 +1345,11 @@ function renderTaskList() {
   const todayStr = now.toISOString().split('T')[0];
   const weekEnd = new Date(now); weekEnd.setDate(now.getDate()+7);
   const weekEndStr = weekEnd.toISOString().split('T')[0];
-  const priorityOrder = {urgent:0,high:1,medium:2,low:3,idea:4};
+  const priorityOrder = {urgent:0,low:1,idea:2};
   let filtered = tasks.slice();
 
   if (currentSmartFilter === 'this-week') filtered = tasks.filter(t=>!t.done&&t.due&&t.due>=todayStr&&t.due<=weekEndStr);
-  else if (currentSmartFilter === 'high-this-week') filtered = tasks.filter(t=>!t.done&&(t.priority==='urgent'||t.priority==='high')&&t.due&&t.due>=todayStr&&t.due<=weekEndStr);
+  else if (currentSmartFilter === 'high-this-week') filtered = tasks.filter(t=>!t.done&&t.priority==='urgent'&&t.due&&t.due>=todayStr&&t.due<=weekEndStr);
   else if (currentSmartFilter === 'overdue') filtered = tasks.filter(t=>!t.done&&isOverdue(t.due));
   else if (currentSmartFilter === 'no-due') filtered = tasks.filter(t=>!t.done&&!t.due);
   else if (currentSmartFilter === 'in-progress') filtered = tasks.filter(t=>!t.done&&t.progress>0&&t.progress<100);
@@ -1365,34 +1375,78 @@ function renderTaskList() {
   filtered.forEach(t => list.appendChild(renderTaskCard(t)));
 }
 
+let filtersOpen = false;
+function toggleFilters() {
+  filtersOpen = !filtersOpen;
+  const panel = document.getElementById('filterPanel');
+  const btn = document.getElementById('filterToggleBtn');
+  const arrow = document.getElementById('filterToggleArrow');
+  if (panel) panel.style.display = filtersOpen ? 'flex' : 'none';
+  if (btn) btn.classList.toggle('open', filtersOpen);
+  if (arrow) arrow.textContent = filtersOpen ? '▴' : '▾';
+}
+function updateFilterPills() {
+  const el = document.getElementById('filterActivePills');
+  if (!el) return;
+  el.innerHTML = '';
+  const urgencyLabels = {urgent:'🔴 High-Urgency', low:'⚪ Low-Urgency', idea:'⟡ Idea'};
+  if (currentFilter && currentFilter !== 'all') {
+    const p = document.createElement('span');
+    p.className = 'filter-active-pill';
+    p.textContent = urgencyLabels[currentFilter] || currentFilter;
+    el.appendChild(p);
+  }
+  if (currentImpFilter) {
+    const p = document.createElement('span');
+    p.className = 'filter-active-pill impact';
+    p.textContent = currentImpFilter === 'important' ? '⭐ Important' : '▽ Low-Impact';
+    el.appendChild(p);
+  }
+  if (currentSmartFilter) {
+    const p = document.createElement('span');
+    p.className = 'filter-active-pill smart';
+    p.textContent = currentSmartFilter.replace(/-/g,' ');
+    el.appendChild(p);
+  }
+  if (currentCatFilter) {
+    const p = document.createElement('span');
+    p.className = 'filter-active-pill cat';
+    p.textContent = currentCatFilter;
+    el.appendChild(p);
+  }
+  // Update toggle button label
+  const lbl = document.getElementById('filterToggleLabel');
+  const hasActive = currentFilter!=='all'||currentImpFilter||currentSmartFilter||currentCatFilter;
+  if (lbl) lbl.textContent = hasActive ? 'Filters ●' : 'Filters';
+}
 function setFilter(f, btn) {
   currentFilter = f; currentSmartFilter = '';
   document.querySelectorAll('.smart-filter-chip:not([onclick*="setCatFilter"])').forEach(c=>c.classList.remove('active'));
   document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active'); renderTaskList();
+  btn.classList.add('active'); renderTaskList(); updateFilterPills();
 }
 function setImpFilter(f, btn) {
   currentImpFilter = f;
   document.querySelectorAll('[id^="impFilter-"]').forEach(c=>c.classList.remove('active'));
-  btn.classList.add('active'); renderTaskList();
+  btn.classList.add('active'); renderTaskList(); updateFilterPills();
 }
 function setSmartFilter(f, btn) {
   currentSmartFilter = currentSmartFilter===f?'':f; currentFilter='all';
   document.querySelectorAll('.filter-chip').forEach(c=>c.classList.toggle('active',c.textContent.trim()==='All'));
   document.querySelectorAll('.smart-filter-chip:not([onclick*="setCatFilter"])').forEach(c=>c.classList.remove('active'));
-  if (currentSmartFilter) btn.classList.add('active'); renderTaskList();
+  if (currentSmartFilter) btn.classList.add('active'); renderTaskList(); updateFilterPills();
 }
 function setCatFilter(cat, btn) {
   currentCatFilter = currentCatFilter===cat?'':cat;
   document.querySelectorAll('#category-filter-row .smart-filter-chip').forEach(c=>c.classList.remove('active'));
   if (!currentCatFilter) document.querySelector('#category-filter-row .smart-filter-chip').classList.add('active');
-  else btn.classList.add('active'); renderTaskList();
+  else btn.classList.add('active'); renderTaskList(); updateFilterPills();
 }
 
 // ═══════════════════════════════════════════════════════════
 // EISENHOWER MATRIX
 // ═══════════════════════════════════════════════════════════
-function isUrgent(t) { return t.priority==='urgent'||t.priority==='high'; }
+function isUrgent(t) { return t.priority==='urgent'; }
 function renderMatrix() {
   const quads = ['q1-tasks','q2-tasks','q3-tasks','q4-tasks'];
   quads.forEach(id => { const el=document.getElementById(id); if(el) el.innerHTML=''; });
@@ -1844,7 +1898,7 @@ function renderWeekCal(area){
           <div class="kanban-card-title${t.done?' strikethrough':''}">${escHtml(t.title)}</div>
           <div class="kanban-card-tags">
             <span class="kanban-card-tag ${t.priority||'medium'}">${priorityLabel(t.priority)}</span>
-            ${t.importance?`<span class="kanban-card-tag">${t.importance==='important'?'⭐':'—'}</span>`:''}
+            ${t.importance?`<span class="kanban-card-tag">${t.importance==='important'?'⭐':'▽'}</span>`:''}
             ${t.category?`<span class="kanban-card-tag cat">${escHtml(t.category)}</span>`:''}
           </div>
           ${t.reminderTime?`<div class="kanban-card-time">⏰ ${t.reminderTime}</div>`:''}
@@ -2370,12 +2424,15 @@ const PIXEL_FONT={'0':[[1,1,1],[1,0,1],[1,0,1],[1,0,1],[1,1,1]],'1':[[0,1,0],[1,
 function renderPixelClock(){
   const secs=Math.max(0,pomoState.secondsLeft),m=String(Math.floor(secs/60)).padStart(2,'0'),s=String(secs%60).padStart(2,'0');
   const container=document.getElementById('pixelDigits');if(!container)return;container.innerHTML='';
-  const SZ=9,GAP=2,COLOR='#e0e0e0',DIM='#1e1e1e';
+  const SZ=9,GAP=2;
+  const isLightMode=document.body.classList.contains('light');
+  const COLOR=isLightMode?'#1a1a2e':'#e0e0e0';
+  const DIM=isLightMode?'#d0d4dc':'#1e1e1e';
   function makeDigit(ch){const grid=PIXEL_FONT[ch],canvas=document.createElement('canvas');canvas.width=3*SZ+2*GAP;canvas.height=5*SZ+4*GAP;canvas.style.imageRendering='pixelated';const ctx=canvas.getContext('2d');grid.forEach((row,ri)=>row.forEach((on,ci)=>{ctx.fillStyle=on?COLOR:DIM;ctx.fillRect(ci*(SZ+GAP),ri*(SZ+GAP),SZ,SZ);}));return canvas;}
   function makeColon(){const canvas=document.createElement('canvas');canvas.width=SZ;canvas.height=5*SZ+4*GAP;canvas.style.imageRendering='pixelated';const ctx=canvas.getContext('2d'),blink=pomoState.running?(Math.floor(Date.now()/500)%2===0):true;ctx.fillStyle=blink?COLOR:DIM;ctx.fillRect(0,SZ+GAP,SZ,SZ);ctx.fillRect(0,3*SZ+3*GAP,SZ,SZ);return canvas;}
   const g1=document.createElement('div');g1.style.cssText='display:flex;gap:4px';g1.appendChild(makeDigit(m[0]));g1.appendChild(makeDigit(m[1]));container.appendChild(g1);container.appendChild(makeColon());const g2=document.createElement('div');g2.style.cssText='display:flex;gap:4px';g2.appendChild(makeDigit(s[0]));g2.appendChild(makeDigit(s[1]));container.appendChild(g2);
   const dateBar=document.getElementById('pomoDateBar');if(dateBar){const now=new Date();dateBar.textContent=`${now.toLocaleDateString([],{weekday:'short'}).toUpperCase()} ${now.getMonth()+1}/${now.getDate()}`;}
-  renderPomoSessions();updatePomoModeLabel();drawPixelTomato();
+  updatePomoModeLabel();drawPixelTomato();
 }
 function drawPixelTomato(){
   const grid=document.getElementById('tomatoGrid');
@@ -2556,9 +2613,9 @@ if(tasks.length===0&&ideas.length===0){
   const tomorrow=new Date(Date.now()+86400000).toISOString().split('T')[0];
   tasks=[
     {id:uid(),title:'Review project proposal',priority:'urgent',importance:'important',due:today,done:false,progress:30,notes:'Need to finalize budget section',category:'Work',created:Date.now()},
-    {id:uid(),title:'Schedule dentist appointment',priority:'medium',importance:'important',due:tomorrow,done:false,progress:0,category:'Health',created:Date.now()},
+    {id:uid(),title:'Schedule dentist appointment',priority:'low',importance:'important',due:tomorrow,done:false,progress:0,category:'Health',created:Date.now()},
     {id:uid(),title:'Read new book chapter',priority:'low',importance:'not-important',done:false,progress:0,category:'Learning',created:Date.now()},
-    {id:uid(),title:'Reply to emails',priority:'high',importance:'not-important',due:today,done:false,progress:0,category:'Work',created:Date.now()},
+    {id:uid(),title:'Reply to emails',priority:'urgent',importance:'not-important',due:today,done:false,progress:0,category:'Work',created:Date.now()},
   ];
   ideas=[
     {id:uid(),text:'Build a custom keyboard shortcut manager for daily workflows',ts:Date.now()-3600000,comments:[]},
